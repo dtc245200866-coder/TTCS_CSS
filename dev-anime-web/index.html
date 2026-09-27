@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phim Hoạt Hình</title>
+<style>
+  /* ============================================================
+     RESET CSS & CẤU HÌNH CHUNG
+     ============================================================ */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #fdfdfd;
+    color: #333;
+    line-height: 1.5;
+  }
+
+  /* Loại bỏ gạch chân của tất cả các link */
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  /* ============================================================
+     HEADER (CỐ ĐỊNH KHI CUỘN TRANG)
+     ============================================================ */
+  .header {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Phần chứa Logo */
+  .header-top {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: #cc0000;
+    font-family: "Times New Roman", Times, serif;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #cc0000;
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    margin-right: 8px;
+    font-size: 20px;
+  }
+
+  /* Phần chứa các liên kết (Head-link) */
+  .head-link {
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    background-color: #fcfcfc;
+  }
+
+  .head-link-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #444;
+  }
+
+  /* Hiệu ứng hover cho link: bôi đậm và chuyển màu */
+  .head-link-inner a {
+    transition: all 0.2s ease;
+  }
+
+  .head-link-inner a:hover {
+    font-weight: bold;
+    color: #cc0000;
+  }
+
+  .head-link-inner .divider {
+    color: #ccc;
+  }
+
+  /* ============================================================
+     BỐ CỤC NỘI DUNG CHÍNH (CONTAINER)
+     ============================================================ */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+  }
+
+  /* --- Cột Trái (Left Content) --- */
+  .left-content {
+    width: 320px; /* Chiều rộng cố định cho menu */
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .video-item {
+    display: block;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 8px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .video-item:hover {
+    background-color: #f5f5f5;
+    border-color: #e0e0e0;
+  }
+
+  /* Trạng thái active (video đang được chọn) */
+  .video-item.active {
+    background-color: #f0f5ff;
+    border-color: #1a73e8;
+  }
+
+  .video-item.active .video-title {
+    color: #1a73e8;
+    font-weight: bold;
+  }
+
+  .video-thumb {
+    width: 100%;
+    height: 180px;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 8px;
+    background-color: #ddd;
+  }
+
+  .video-title {
+    font-size: 15px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .video-meta {
+    font-size: 13px;
+    color: #666;
+  }
+
+  .video-meta span {
+    display: block;
+    color: #888;
+    font-size: 12px;
+  }
+
+  /* --- Cột Phải (Right Content) --- */
+  .right-content {
+    flex: 1; /* Tự động giãn nở chiếm hết không gian còn lại */
+    min-width: 0;
+  }
+
+  .main-video-player {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: #000;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+    background-image: url('https://placehold.co/800x450/222/fff?text=Doraemon+Video');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .play-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .play-overlay:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  .main-video-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #222;
+    margin-bottom: 6px;
+  }
+
+  .main-video-meta {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 16px;
+  }
+
+  .main-video-meta span {
+    color: #444;
+  }
+
+  .main-video-desc {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.6;
+    text-align: justify;
+  }
+
+  .main-video-desc p {
+    margin-bottom: 12px;
+  }
+
+  /* ============================================================
+     FOOTER
+     ============================================================ */
+  .footer {
+    background-color: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
+    padding: 24px 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+    margin-top: 20px;
+  }
+
+  /* ============================================================
+     RESPONSIVE (MỨC NÂNG CAO)
+     ============================================================ */
+  /* Tablet: Điều chỉnh tỷ lệ cột */
+  @media (max-width: 992px) {
+    .container {
+      padding: 15px;
+      gap: 15px;
+    }
+    .left-content {
+      width: 260px;
+    }
+    .video-thumb {
+      height: 140px;
+    }
+    .main-video-title {
+      font-size: 18px;
+    }
+  }
+
+  /* Mobile: Chuyển thành 1 cột dọc */
+  @media (max-width: 768px) {
+    .header-top {
+      padding: 10px 15px;
+    }
+    .logo {
+      font-size: 24px;
+    }
+    .logo-icon {
+      width: 30px;
+      height: 30px;
+      font-size: 16px;
+    }
+    .head-link-inner {
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 8px 15px;
+      font-size: 14px;
+    }
+    .head-link-inner .divider {
+      display: none; /* Ẩn dấu gạch phân cách trên mobile */
+    }
+
+    .container {
+      flex-direction: column; /* Chuyển thành bố cục dọc */
+    }
+
+    /* Đưa nội dung video chính lên trên, danh sách video xuống dưới */
+    .right-content {
+      order: 1;
+    }
+    .left-content {
+      order: 2;
+      width: 100%;
+    }
+
+    .video-thumb {
+      height: 200px; /* Tăng chiều cao ảnh thumb trên mobile */
+    }
+    
+    .main-video-player {
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .logo {
+      font-size: 20px;
+    }
+    .head-link-inner {
+      justify-content: flex-start;
+    }
+    .main-video-title {
+      font-size: 16px;
+    }
+    .main-video-desc {
+      font-size: 13px;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ================= HEADER ================= -->
+  <div class="header">
+    <div class="header-top">
+      <div class="logo">
+        <span class="logo-icon">😊</span>
+        Phim Hoạt Hình
+      </div>
+    </div>
+    <div class="head-link">
+      <div class="head-link-inner">
+        <a href="#">Phim hoạt hình</a>
+        <span class="divider">|</span>
+        <a href="#">Phim hoạt hình yêu thích</a>
+        <span class="divider">|</span>
+        <a href="#">Nhân vật hoạt hình</a>
+        <span class="divider">|</span>
+        <a href="#">Góp ý</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= NỘI DUNG CHÍNH ================= -->
+  <div class="container">
+
+    <!-- Left Content: Danh sách video -->
+    <div class="left-content">
+      
+      <!-- Video 1 (Mặc định được chọn/Active) -->
+      <div class="video-item active">
+        <div class="video-thumb" style="background-image: url('https://placehold.co/320x180/8B4513/fff?text=Welcome+Nobi');"></div>
+        <div class="video-title">Welcome đến với khách sạn Nobi</div>
+        <div class="video-meta">
+          5,147,528 lượt xem
+          <span>Channel Fun</span>
+        </div>
+      </div>
+
+      <!-- Video 2 -->
+      <div class="video-item">
+        <div class="video-thumb" style="background-image: url('https://placehold.co/320x180/2E8B57/fff?text=Suneo+Khổng+Lồ');"></div>
+        <div class="video-title">Suneo khổng lồ</div>
+        <div class="video-meta">
+          5,147,528 lượt xem
+          <span>Doraemon Vietsub</span>
+        </div>
+      </div>
+
+      <!-- Video 3 -->
+      <div class="video-item">
+        <div class="video-thumb" style="background-image: url('https://placehold.co/320x180/4682B4/fff?text=Cồi+Điều+Khiển');"></div>
+        <div class="video-title">Cồi điều khiển vật</div>
+        <div class="video-meta">
+          5,147,528 lượt xem
+          <span>Doraemon Vietsub</span>
+        </div>
+      </div>
+
+      <!-- Video 4 -->
+      <div class="video-item">
+        <div class="video-thumb" style="background-image: url('https://placehold.co/320x180/FF8C00/fff?text=Máy+Tạo+Kẹo+Bông');"></div>
+        <div class="video-title">Chiếc máy tạo kẹo bông</div>
+        <div class="video-meta">
+          5,147,528 lượt xem
+          <span>Doraemon Vietsub</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Content: Chi tiết video được chọn -->
+    <div class="right-content">
+      
+      <div class="main-video-player">
+        <div class="play-overlay">▶</div>
+      </div>
+
+      <h2 class="main-video-title">Doraemon Ep 430 - Tớ là Mari đây &amp; Gậy di chuyển</h2>
+      
+      <div class="main-video-meta">
+        Tớ là Mari - 5,147,528 lượt xem <br>
+        <span>Tác giả</span>
+      </div>
+
+      <div class="main-video-desc">
+        <p>Bộ phim kể về câu chuyện Thạch Sanh chém Trăn Tinh cứu dân, bắn Đại Bàng cứu công chúa, dùng tiếng đàn nhân nghĩa dẹp tan quân xâm lăng. Nhưng cuộc đời Thạch Sanh luôn bị tên Lý Thông làm cho điêu đứng. Cuối cùng chính nghĩa đã thắng. Tên Lý Thông gian ác bị đền tội. Mời các bạn cùng đón xem và cảm nhận.</p>
+        <p>Bộ phim kể về câu chuyện Thạch Sanh chém Trăn Tinh cứu dân, bắn Đại Bàng cứu công chúa, dùng tiếng đàn nhân nghĩa dẹp tan quân xâm lăng. Nhưng cuộc đời Thạch Sanh luôn bị tên Lý Thông làm cho điêu đứng. Cuối cùng chính nghĩa đã thắng. Tên Lý Thông gian ác bị đền tội. Mời các bạn cùng đón xem và cảm nhận.</p>
+        <p>Bộ phim kể về câu chuyện Thạch Sanh chém Trăn Tinh cứu dân, bắn Đại Bàng cứu công chúa, dùng tiếng đàn nhân nghĩa dẹp tan quân xâm lăng. Nhưng cuộc đời Thạch Sanh luôn bị tên Lý Thông làm cho điêu đứng. Cuối cùng chính nghĩa đã thắng. Tên Lý Thông gian ác bị đền tội. Mời các bạn cùng đón xem và cảm nhận.</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <div class="footer">
+    © 2017 - Thiết kế web bởi trang hoathinhvn.net
+  </div>
+
+</body>
+</html>
