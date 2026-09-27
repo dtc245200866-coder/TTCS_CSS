@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Facebook — Giao diện giản lược</title>
+<style>
+  /* ============================================================
+     1. BIẾN TOÀN CỤC
+     ============================================================ */
+  :root {
+    --fb-blue: #1877f2;
+    --bg: #f0f2f5;
+    --surface: #ffffff;
+    --text: #050505;
+    --text-muted: #65676b;
+    --hover: #e4e6eb;
+    --hover-strong: #d8dade;
+    --divider: #ced0d4;
+    --radius: 8px;
+    --header-h: 56px;
+    --sidebar-w: 280px;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--text);
+    background: var(--bg);
+  }
+
+  a { color: inherit; text-decoration: none; }
+  ul { list-style: none; }
+  button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+  svg { display: block; }
+
+  /* ============================================================
+     2. HEADER CỐ ĐỊNH (position: fixed)
+     ============================================================ */
+  .header {
+    position: fixed;
+    inset: 0 0 auto 0;          /* top:0 right:0 bottom:auto left:0 */
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    z-index: 100;               /* luôn nằm trên nội dung */
+  }
+
+  /* --- 2.1 Khối bên trái: logo + ô tìm kiếm --- */
+  .header__left {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--fb-blue);
+    color: #fff;
+    font-size: 27px;
+    font-weight: 700;
+    line-height: 1;
+    padding-bottom: 4px;
+  }
+
+  .search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 240px;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 20px;
+    background: var(--bg);
+    color: var(--text-muted);
+  }
+  .search svg { width: 16px; height: 16px; flex: none; }
+  .search input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: none;
+    font-size: 15px;
+    color: var(--text);
+  }
+
+  /* --- 2.2 Khối giữa: điều hướng chính --- */
+  .header__nav {
+    flex: none;
+    display: flex;
+    gap: 8px;
+  }
+
+  .nav-btn {
+    position: relative;
+    width: 110px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    transition: background .15s;
+  }
+  .nav-btn svg { width: 28px; height: 28px; }
+  .nav-btn:hover { background: var(--hover); }
+  .nav-btn.active { color: var(--fb-blue); }
+  .nav-btn.active::after {            /* gạch chân chỉ tab đang chọn */
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+    background: var(--fb-blue);
+  }
+
+  /* --- 2.3 Khối bên phải: tiện ích + avatar --- */
+  .header__right {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--hover);
+    color: var(--text);
+    transition: background .15s;
+  }
+  .icon-btn svg { width: 20px; height: 20px; }
+  .icon-btn:hover { background: var(--hover-strong); }
+
+  /* ============================================================
+     3. AVATAR (dùng chung)
+     ============================================================ */
+  .avatar {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+  }
+  .avatar--sm { width: 32px; height: 32px; font-size: 13px; }
+  .avatar--blue   { background: linear-gradient(135deg, #1877f2, #4a9bff); }
+  .avatar--purple { background: linear-gradient(135deg, #7b2ff7, #c471ed); }
+  .avatar--green  { background: linear-gradient(135deg, #11998e, #38ef7d); }
+  .avatar--orange { background: linear-gradient(135deg, #f7971e, #ffb800); }
+  .avatar--pink   { background: linear-gradient(135deg, #ee0979, #ff6a00); }
+
+  /* ============================================================
+     4. SIDEBAR CỐ ĐỊNH (position: fixed)
+     ============================================================ */
+  .sidebar {
+    position: fixed;
+    top: var(--header-h);
+    bottom: 0;
+    width: var(--sidebar-w);
+    padding: 16px 8px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .sidebar--left  { left: 0; }
+  .sidebar--right { right: 0; }
+
+  /* Thanh cuộn mảnh cho sidebar */
+  .sidebar::-webkit-scrollbar { width: 8px; }
+  .sidebar::-webkit-scrollbar-thumb {
+    background: #bcc0c4;
+    border-radius: 4px;
+  }
+  .sidebar::-webkit-scrollbar-thumb:hover { background: #a0a4a8; }
+
+  /* --- 4.1 Item dùng chung cho sidebar --- */
+  .side-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    border-radius: var(--radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .side-item:hover { background: var(--hover); }
+  .side-item__icon {
+    flex: none;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: #fff;
+  }
+  .side-item__icon svg { width: 20px; height: 20px; }
+
+  .side-title {
+    padding: 8px;
+    margin-top: 8px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .divider {
+    height: 1px;
+    margin: 8px 8px;
+    background: var(--divider);
+  }
+
+  /* --- 4.2 Sidebar phải: mục được tài trợ --- */
+  .sponsor {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+  .sponsor:hover { background: var(--hover); }
+  .sponsor__thumb {
+    flex: none;
+    width: 110px;
+    height: 76px;
+    border-radius: var(--radius);
+    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+  }
+  .sponsor__thumb--2 { background: linear-gradient(135deg, #fbc2eb, #a6c1ee); }
+  .sponsor__thumb--3 { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
+  .sponsor__name { font-weight: 500; font-size: 14px; }
+  .sponsor__link { font-size: 12px; color: var(--text-muted); }
+
+  /* ============================================================
+     5. VÙNG NỘI DUNG CHÍNH
+     ============================================================ */
+  .content {
+    margin-left: var(--sidebar-w);    /* chừa chỗ cho sidebar trái */
+    margin-right: var(--sidebar-w);   /* chừa chỗ cho sidebar phải */
+    padding: calc(var(--header-h) + 16px) 16px 40px;
+  }
+
+  .main {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 12px 16px;
+  }
+
+  /* --- 5.1 Dải Stories --- */
+  .stories {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .story {
+    position: relative;
+    height: 200px;
+    display: flex;
+    align-items: flex-end;
+    padding: 10px;
+    border-radius: 12px;
+    overflow: hidden;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: linear-gradient(160deg, #667eea, #764ba2);
+    box-shadow: var(--shadow);
+    transition: transform .15s;
+  }
+  .story:hover { transform: scale(1.02); }
+  .story:nth-child(2) { background: linear-gradient(160deg, #f7971e, #ffd200); }
+  .story:nth-child(3) { background: linear-gradient(160deg, #11998e, #38ef7d); }
+  .story:nth-child(4) { background: linear-gradient(160deg, #ee0979, #ff6a00); }
+  .story .avatar {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 38px;
+    height: 38px;
+    border: 3px solid var(--fb-blue);
+  }
+
+  /* --- 5.2 Ô "Bạn đang nghĩ gì thế?" --- */
+  .create-post {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 12px;
+  }
+  .create-post__input {
+    flex: 1;
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 20px;
+    background: var(--bg);
+    text-align: left;
+    color: var(--text-muted);
+    transition: background .15s;
+  }
+  .create-post__input:hover { background: var(--hover); }
+
+  .create-post__actions {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 8px;
+  }
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-muted);
+    transition: background .15s;
+  }
+  .action-btn:hover { background: var(--hover); }
+  .action-btn svg { width: 22px; height: 22px; }
+  .action-btn--live svg  { color: #f3425f; }
+  .action-btn--photo svg { color: #45bd62; }
+  .action-btn--feel svg  { color: #f7b928; }
+
+  /* --- 5.3 Bài viết --- */
+  .post { padding: 12px 16px; }
+
+  .post__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .post__meta { flex: 1; min-width: 0; }
+  .post__name { font-weight: 600; }
+  .post__name:hover { text-decoration: underline; cursor: pointer; }
+  .post__time {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .post__time svg { width: 12px; height: 12px; }
+
+  .post__more {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    font-size: 20px;
+    color: var(--text-muted);
+  }
+  .post__more:hover { background: var(--hover); }
+
+  .post__text { margin: 12px 0; }
+
+  .post__media {
+    height: 320px;
+    margin: 0 -16px;
+    display: grid;
+    place-items: center;
+    font-weight: 600;
+    color: #4a5568;
+    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+  }
+
+  .post__stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  .post__reactions { display: flex; align-items: center; gap: 6px; }
+  .reaction {
+    width: 20px;
+    height: 20px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    font-size: 11px;
+    color: #fff;
+    border: 2px solid var(--surface);
+  }
+  .reaction--like { background: #1877f2; }
+  .reaction--love { background: #f3425f; margin-left: -8px; }
+
+  .post__actions {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 8px;
+    margin-top: 8px;
+    border-top: 1px solid var(--divider);
+  }
+
+  /* ============================================================
+     6. RESPONSIVE
+     ============================================================ */
+  /* Ẩn sidebar phải khi không đủ chỗ */
+  @media (max-width: 1300px) {
+    .sidebar--right { display: none; }
+    .content { margin-right: 0; }
+  }
+  /* Ẩn sidebar trái */
+  @media (max-width: 1000px) {
+    .sidebar--left { display: none; }
+    .content { margin-left: 0; }
+  }
+  /* Ẩn menu điều hướng giữa header */
+  @media (max-width: 900px) {
+    .header__nav { display: none; }
+  }
+  /* Ẩn ô tìm kiếm trên mobile */
+  @media (max-width: 620px) {
+    .search { display: none; }
+    .stories { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER CỐ ĐỊNH
+     ============================================================ -->
+<header class="header">
+  <!-- Trái: logo + tìm kiếm -->
+  <div class="header__left">
+    <a href="#" class="logo" aria-label="Facebook">f</a>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+           stroke-linecap="round">
+        <circle cx="11" cy="11" r="7" />
+        <path d="M20 20l-3.5-3.5" />
+      </svg>
+      <input type="text" placeholder="Tìm kiếm trên Facebook" />
+    </div>
+  </div>
+
+  <!-- Giữa: điều hướng -->
+  <nav class="header__nav">
+    <a href="#" class="nav-btn active" title="Trang chủ">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 3.1 2.4 11.2a1 1 0 0 0 .6 1.8H5v7a1 1 0 0 0 1 1h3.5V15h5v6H18a1 1 0 0 0 1-1v-7h2a1 1 0 0 0 .6-1.8L12 3.1Z"/>
+      </svg>
+    </a>
+    <a href="#" class="nav-btn" title="Bạn bè">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M9 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-7 2c-3 0-6 1.5-6 4.5V21h12v-2.5c0-3-3-4.5-6-4.5Zm7 0c-.8 0-1.6.1-2.3.3A6.2 6.2 0 0 1 16 18.5V21h6v-2.5c0-3-3-4.5-6-4.5Z"/>
+      </svg>
+    </a>
+    <a href="#" class="nav-btn" title="Video">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm5 4v8l7-4-7-4Z"/>
+      </svg>
+    </a>
+    <a href="#" class="nav-btn" title="Nhóm">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0 12c-4.4 0-8 2.2-8 5v2h16v-2c0-2.8-3.6-5-8-5Z"/>
+      </svg>
+    </a>
+  </nav>
+
+  <!-- Phải: tiện ích + avatar -->
+  <div class="header__right">
+    <button class="icon-btn" title="Menu">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/>
+        <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+        <circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/>
+      </svg>
+    </button>
+    <button class="icon-btn" title="Messenger">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.5 2 2 6.1 2 11.2c0 2.9 1.4 5.4 3.6 7.1V22l3.3-1.8c1 .3 2 .4 3.1.4 5.5 0 10-4.1 10-9.2S17.5 2 12 2Zm1 12-2.6-2.7L5.5 14l5.4-5.7 2.6 2.7L18.5 8 13 13.9Z"/>
+      </svg>
+    </button>
+    <button class="icon-btn" title="Thông báo">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2a6 6 0 0 0-6 6v3.6l-1.7 3.4A1 1 0 0 0 5.2 17h13.6a1 1 0 0 0 .9-1.5L18 11.6V8a6 6 0 0 0-6-6Zm0 20a3 3 0 0 0 3-3H9a3 3 0 0 0 3 3Z"/>
+      </svg>
+    </button>
+    <a href="#" class="avatar avatar--blue" title="Trang cá nhân">A</a>
+  </div>
+</header>
+
+<!-- ============================================================
+     SIDEBAR TRÁI (CỐ ĐỊNH)
+     ============================================================ -->
+<aside class="sidebar sidebar--left">
+  <a href="#" class="side-item">
+    <span class="avatar avatar--blue">A</span>
+    <span>An Nguyễn</span>
+  </a>
+
+  <ul>
+    <li>
+      <a href="#" class="side-item">
+        <span class="side-item__icon" style="background:#1877f2">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-7 2c-3 0-6 1.5-6 4.5V21h12v-2.5c0-3-3-4.5-6-4.5Zm7 0c-.8 0-1.6.1-2.3.3A6.2 6.2 0 0 1 16 18.5V21h6v-2.5c0-3-3-4.5-6-4.5Z"/>
+          </svg>
+        </span>
+        <span>Bạn bè</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="side-item">
+        <span class="side-item__icon" style="background:#45bd62">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0 12c-4.4 0-8 2.2-8 5v2h16v-2c0-2.8-3.6-5-8-5Z"/>
+          </svg>
+        </span>
+        <span>Nhóm</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="side-item">
+        <span class="side-item__icon" style="background:#f7b928">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 3h18l1 6H2l1-6Zm1 8h16v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1v-9Z"/>
+          </svg>
+        </span>
+        <span>Marketplace</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="side-item">
+        <span class="side-item__icon" style="background:#f3425f">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm5 4v8l7-4-7-4Z"/>
+          </svg>
+        </span>
+        <span>Video</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="side-item">
+        <span class="side-item__icon" style="background:#7b2ff7">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 2v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm12 8v10H5V10h14Z"/>
+          </svg>
+        </span>
+        <span>Sự kiện</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="side-item">
+        <span class="side-item__icon" style="background:#11998e">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 2h12a1 1 0 0 1 1 1v19l-7-4-7 4V3a1 1 0 0 1 1-1Z"/>
+          </svg>
+        </span>
+        <span>Đã lưu</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="side-item">
+        <span class="side-item__icon" style="background:#65676b">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm1 5v5.6l4 2.4-1 1.7-5-3V7h2Z"/>
+          </svg>
+        </span>
+        <span>Kỷ niệm</span>
+      </a>
+    </li>
+  </ul>
+
+  <div class="divider"></div>
+  <h3 class="side-title">Lối tắt của bạn</h3>
+  <ul>
+    <li><a href="#" class="side-item">
+      <span class="side-item__icon" style="background:linear-gradient(135deg,#a1c4fd,#c2e9fb);color:#2d3748;font-size:12px;font-weight:700">JS</span>
+      <span>JavaScript Nâng Cao</span>
+    </a></li>
+    <li><a href="#" class="side-item">
+      <span class="side-item__icon" style="background:linear-gradient(135deg,#fbc2eb,#a6c1ee);color:#2d3748;font-size:12px;font-weight:700">UI</span>
+      <span>Hội Thiết Kế UI/UX</span>
+    </a></li>
+    <li><a href="#" class="side-item">
+      <span class="side-item__icon" style="background:linear-gradient(135deg,#ffecd2,#fcb69f);color:#2d3748;font-size:12px;font-weight:700">FE</span>
+      <span>Frontend Việt Nam</span>
+    </a></li>
+  </ul>
+</aside>
+
+<!-- ============================================================
+     NỘI DUNG CHÍNH
+     ============================================================ -->
+<div class="content">
+  <main class="main">
+
+    <!-- Stories -->
+    <section class="stories">
+      <div class="story">
+        <span class="avatar avatar--blue avatar--sm">A</span>
+        Tạo tin
+      </div>
+      <div class="story">
+        <span class="avatar avatar--pink avatar--sm">M</span>
+        Minh Anh
+      </div>
+      <div class="story">
+        <span class="avatar avatar--green avatar--sm">T</span>
+        Tuấn Kiệt
+      </div>
+      <div class="story">
+        <span class="avatar avatar--purple avatar--sm">L</span>
+        Lan Phương
+      </div>
+    </section>
+
+    <!-- Ô tạo bài viết -->
+    <section class="card">
+      <div class="create-post">
+        <span class="avatar avatar--blue">A</span>
+        <button class="create-post__input">Bạn đang nghĩ gì thế?</button>
+      </div>
+      <div class="divider"></div>
+      <div class="create-post__actions">
+        <button class="action-btn action-btn--live">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 3.5V7l-4 3.5Z"/>
+          </svg>
+          Video trực tiếp
+        </button>
+        <button class="action-btn action-btn--photo">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 14h16l-5-6-4 5-3-3-4 4Z"/>
+          </svg>
+          Ảnh/Video
+        </button>
+        <button class="action-btn action-btn--feel">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2ZM8.5 9a1.5 1.5 0 1 1 1.5 1.5A1.5 1.5 0 0 1 8.5 9Zm7 0A1.5 1.5 0 1 1 14 10.5 1.5 1.5 0 0 1 15.5 9ZM12 18a6 6 0 0 1-5-2.7h10A6 6 0 0 1 12 18Z"/>
+          </svg>
+          Cảm xúc
+        </button>
+      </div>
+    </section>
+
+    <!-- Bài viết 1 -->
+    <article class="card post">
+      <div class="post__head">
+        <span class="avatar avatar--pink">M</span>
+        <div class="post__meta">
+          <div class="post__name">Minh Anh</div>
+          <div class="post__time">
+            2 giờ trước ·
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8Zm1-13h-2v6l5 3 1-1.7-4-2.3V7Z"/>
+            </svg>
+          </div>
+        </div>
+        <button class="post__more">···</button>
+      </div>
+
+      <p class="post__text">
+        Hôm nay trời đẹp quá, cả nhà đi chơi công viên 🌳☀️
+      </p>
+
+      <div class="post__media">Ảnh minh hoạ</div>
+
+      <div class="post__stats">
+        <div class="post__reactions">
+          <span class="reaction reaction--like">👍</span>
+          <span class="reaction reaction--love">❤️</span>
+          <span>128</span>
+        </div>
+        <div>24 bình luận · 6 chia sẻ</div>
+      </div>
+
+      <div class="post__actions">
+        <button class="action-btn">👍 Thích</button>
+        <button class="action-btn">💬 Bình luận</button>
+        <button class="action-btn">↗️ Chia sẻ</button>
+      </div>
+    </article>
+
+    <!-- Bài viết 2 -->
+    <article class="card post">
+      <div class="post__head">
+        <span class="avatar avatar--green">T</span>
+        <div class="post__meta">
+          <div class="post__name">Tuấn Kiệt</div>
+          <div class="post__time">
+            5 giờ trước ·
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8Zm1-13h-2v6l5 3 1-1.7-4-2.3V7Z"/>
+            </svg>
+          </div>
+        </div>
+        <button class="post__more">···</button>
+      </div>
+
+      <p class="post__text">
+        Vừa hoàn thành xong dự án đầu tiên bằng HTML/CSS. Mọi người cho mình xin ý kiến nhé! 🚀
+      </p>
+
+      <div class="post__stats">
+        <div class="post__reactions">
+          <span class="reaction reaction--like">👍</span>
+          <span>56</span>
+        </div>
+        <div>9 bình luận · 2 chia sẻ</div>
+      </div>
+
+      <div class="post__actions">
+        <button class="action-btn">👍 Thích</button>
+        <button class="action-btn">💬 Bình luận</button>
+        <button class="action-btn">↗️ Chia sẻ</button>
+      </div>
+    </article>
+
+  </main>
+</div>
+
+<!-- ============================================================
+     SIDEBAR PHẢI (CỐ ĐỊNH)
+     ============================================================ -->
+<aside class="sidebar sidebar--right">
+  <h3 class="side-title" style="margin-top:0">Được tài trợ</h3>
+
+  <a href="#" class="sponsor">
+    <div class="sponsor__thumb"></div>
+    <div>
+      <div class="sponsor__name">Khoá học Frontend</div>
+      <div class="sponsor__link">hocweb.vn</div>
+    </div>
+  </a>
+
+  <a href="#" class="sponsor">
+    <div class="sponsor__thumb sponsor__thumb--2"></div>
+    <div>
+      <div class="sponsor__name">Thiết kế UI/UX</div>
+      <div class="sponsor__link">designpro.vn</div>
+    </div>
+  </a>
+
+  <a href="#" class="sponsor">
+    <div class="sponsor__thumb sponsor__thumb--3"></div>
+    <div>
+      <div class="sponsor__name">Laptop giảm giá</div>
+      <div class="sponsor__link">shoptech.vn</div>
+    </div>
+  </a>
+
+  <div class="divider"></div>
+
+  <h3 class="side-title">Người liên hệ</h3>
+
+  <a href="#" class="side-item">
+    <span class="avatar avatar--sm avatar--purple">L</span>
+    <span>Lan Phương</span>
+  </a>
+  <a href="#" class="side-item">
+    <span class="avatar avatar--sm avatar--orange">H</span>
+    <span>Hoàng Nam</span>
+  </a>
+  <a href="#" class="side-item">
+    <span class="avatar avatar--sm avatar--green">T</span>
+    <span>Tuấn Kiệt</span>
+  </a>
+  <a href="#" class="side-item">
+    <span class="avatar avatar--sm avatar--pink">M</span>
+    <span>Minh Anh</span>
+  </a>
+</aside>
+
+</body>
+</html>
