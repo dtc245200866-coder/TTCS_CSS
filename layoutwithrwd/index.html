@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bố cục Responsive</title>
+<style>
+  /* ===== RESET ===== */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #222;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;   /* để footer luôn nằm dưới cùng */
+  }
+
+  /* ===== HEADER (NAVBAR) ===== */
+  .navbar {
+    display: flex;
+    align-items: stretch;
+    background: #333;
+    height: 56px;
+  }
+
+  .navbar .logo {
+    display: flex;
+    align-items: center;
+    padding: 0 26px;
+    font-size: 22px;
+    color: #ccc;
+    font-weight: 400;
+  }
+
+  .navbar a {
+    text-decoration: none;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0 22px;
+    color: #dcdcdc;
+    font-size: 15px;
+    transition: background .2s, color .2s;
+  }
+
+  .nav-link:hover {
+    background: #444;
+    color: #fff;
+  }
+
+  .nav-link.active {
+    background: #000;
+    color: #fff;
+  }
+
+  .nav-login {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;    /* đẩy Login sang phải */
+    padding: 0 24px;
+    color: #dcdcdc;
+    font-size: 15px;
+    transition: background .2s;
+  }
+
+  .nav-login:hover {
+    background: #444;
+    color: #fff;
+  }
+
+  .nav-login svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+
+  /* ===== BỐ CỤC 3 CỘT ===== */
+  .container {
+    display: flex;
+    flex: 1;              /* chiếm toàn bộ chiều cao còn lại */
+    align-items: stretch;
+  }
+
+  /* --- Sidebar chung --- */
+  .sidebar {
+    width: 200px;
+    flex-shrink: 0;
+    background: #f1f1f1;
+    padding: 30px 22px;
+  }
+
+  .sidebar a {
+    display: block;
+    color: #1a73e8;
+    text-decoration: none;
+    font-size: 15px;
+    margin-bottom: 16px;
+  }
+
+  .sidebar a:hover {
+    text-decoration: underline;
+  }
+
+  /* --- Cột nội dung chính --- */
+  .main-content {
+    flex: 1;
+    background: #fff;
+    padding: 26px 34px;
+    min-width: 0;         /* tránh tràn khi co lại */
+  }
+
+  .main-content h1 {
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .main-content h2 {
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .main-content p {
+    font-size: 16px;
+    line-height: 1.55;
+    margin-bottom: 16px;
+    text-align: justify;
+  }
+
+  .main-content hr {
+    border: none;
+    border-top: 1px solid #e2e2e2;
+    margin: 22px 0;
+  }
+
+  /* --- Hộp quảng cáo (ADS) --- */
+  .ad-box {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 45px 10px;
+    text-align: center;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    background: #555;
+    color: #fff;
+    text-align: center;
+    padding: 22px 16px;
+    font-size: 15px;
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+
+  /* --- Tablet: thu nhỏ sidebar --- */
+  @media (max-width: 900px) {
+    .sidebar {
+      width: 160px;
+      padding: 22px 14px;
+    }
+    .main-content {
+      padding: 20px 22px;
+    }
+    .main-content h1 { font-size: 32px; }
+    .main-content h2 { font-size: 24px; }
+  }
+
+  /* --- Mobile: dồn thành 1 cột --- */
+  @media (max-width: 700px) {
+    .navbar {
+      height: auto;
+      flex-wrap: wrap;
+    }
+    .navbar .logo {
+      height: 56px;
+      padding: 0 16px;
+    }
+    .nav-link {
+      height: 48px;
+      padding: 0 16px;
+      font-size: 14px;
+    }
+    .nav-login {
+      height: 56px;
+      padding: 0 16px;
+    }
+
+    .container {
+      flex-direction: column;
+    }
+
+    /* Đưa nội dung chính lên đầu, sidebar xuống dưới */
+    .main-content { order: 1; }
+    .sidebar      { order: 2; width: 100%; }
+
+    .main-content { padding: 20px 18px; }
+    .main-content h1 { font-size: 28px; }
+    .main-content h2 { font-size: 22px; }
+    .main-content p  { font-size: 15px; }
+
+    .sidebar {
+      padding: 18px;
+    }
+    .sidebar a { margin-bottom: 12px; }
+
+    .ad-box { padding: 28px 10px; }
+  }
+
+  /* --- Mobile rất nhỏ: thu gọn navbar --- */
+  @media (max-width: 420px) {
+    .navbar .logo { padding: 0 12px; font-size: 18px; }
+    .nav-link     { padding: 0 10px; font-size: 13px; }
+    .nav-login    { padding: 0 12px; font-size: 13px; }
+    .nav-login span { display: none; } /* chỉ giữ icon login */
+  }
+</style>
+</head>
+<body>
+
+  <!-- ================= HEADER ================= -->
+  <header class="navbar">
+    <div class="logo">Logo</div>
+
+    <a href="#" class="nav-link active">Home</a>
+    <a href="#" class="nav-link">About</a>
+    <a href="#" class="nav-link">Projects</a>
+    <a href="#" class="nav-link">Contact</a>
+
+    <a href="#" class="nav-login">
+      <!-- Icon login -->
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M10 17l1.4-1.4L8.8 13H16v-2H8.8l2.6-2.6L10 7l-5 5 5 5z"/>
+        <path d="M19 3h-7v2h7v14h-7v2h7a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/>
+      </svg>
+      <span>Login</span>
+    </a>
+  </header>
+
+  <!-- ================= NỘI DUNG 3 CỘT ================= -->
+  <div class="container">
+
+    <!-- Sidebar trái -->
+    <aside class="sidebar">
+      <a href="#">Link</a>
+      <a href="#">Link</a>
+      <a href="#">Link</a>
+    </aside>
+
+    <!-- Nội dung chính -->
+    <main class="main-content">
+      <h1>Welcome</h1>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+        consequat. Excepteur sint occaecat cupidatat non proident, sunt in culpa
+        qui officia deserunt mollit anim id est laborum consectetur adipiscing elit,
+        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+        ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+        ex ea commodo consequat.
+      </p>
+
+      <hr>
+
+      <h2>Test</h2>
+      <p>Lorem ipsum...</p>
+    </main>
+
+    <!-- Sidebar phải (quảng cáo) -->
+    <aside class="sidebar">
+      <div class="ad-box">ADS</div>
+      <div class="ad-box">ADS</div>
+    </aside>
+
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="footer">
+    Footer Text
+  </footer>
+
+</body>
+</html>
